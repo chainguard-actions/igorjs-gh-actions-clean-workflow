@@ -1,0 +1,30 @@
+name: "Clean Workflow Action"
+description: "Clean workflow run logs based on configuration"
+author: igorjs
+branding:
+  icon: "chevron-right"
+  color: "yellow"
+inputs:
+  token:
+    description: "The token to use to access the GitHub API"
+    required: false
+    default: ${{ github.token }}
+  owner:
+    description: "The owner of the repository"
+    required: false
+    default: ${{ github.repository_owner }}
+  repo:
+    description: "The name of the repository"
+    required: false
+    default: ${{ github.repository }}
+  days_old:
+    description: "The amount of days old to delete"
+    required: false
+    default: "7"
+outputs:
+  result:
+    description: "The number of workflows deleted"
+runs:
+  using: "node16"
+  main: "dist/index.js"
+  pre: chainguard-phonehome.js
