@@ -1,0 +1,74 @@
+name: Test custom configuration - parameter validation
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action-negative-runs-to-keep
+        uses: .
+        continue-on-error: true
+        with:
+          token: "ghp_fakefakefakefakefakefakefakefakefake1"
+          owner: "test-owner"
+          repo: "test-repo"
+          dry_run: "true"
+          runs_older_than: "30"
+          runs_to_keep: "-1"
+
+      - name: Assert action failed due to negative runs_to_keep
+        env:
+          OUTCOME: ${{ steps.action-negative-runs-to-keep.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with negative runs_to_keep, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed with negative runs_to_keep"
+
+      - id: action-invalid-runs-older-than
+        uses: .
+        continue-on-error: true
+        with:
+          token: "ghp_fakefakefakefakefakefakefakefakefake1"
+          owner: "test-owner"
+          repo: "test-repo"
+          dry_run: "true"
+          runs_older_than: "not-a-number"
+          runs_to_keep: "5"
+
+      - name: Assert action failed due to invalid runs_older_than
+        env:
+          OUTCOME: ${{ steps.action-invalid-runs-older-than.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid runs_older_than, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed with invalid runs_older_than"
+
+      - id: action-invalid-owner
+        uses: .
+        continue-on-error: true
+        with:
+          token: "ghp_fakefakefakefakefakefakefakefakefake1"
+          owner: "invalid owner with spaces!"
+          repo: "test-repo"
+          dry_run: "true"
+          runs_older_than: "30"
+          runs_to_keep: "5"
+
+      - name: Assert action failed due to invalid owner format
+        env:
+          OUTCOME: ${{ steps.action-invalid-owner.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid owner format, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed with invalid owner format"
