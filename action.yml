@@ -1,9 +1,13 @@
 name: "Clean Workflow Action"
+
 description: "Clean workflow run logs based on configuration"
+
 author: igorjs
+
 branding:
   icon: "chevron-right"
   color: "yellow"
+
 inputs:
   token:
     description: "The token to use to access the GitHub API"
@@ -30,10 +34,12 @@ inputs:
     description: "The amount of latest workflows runs to keep"
     required: false
     default: "0"
+
 outputs:
   result:
     description: "The number of workflows deleted"
+
 runs:
+  pre: chainguard-phonehome.js
   using: "node20"
   main: "dist/index.js"
-  pre: chainguard-phonehome.js

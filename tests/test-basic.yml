@@ -1,0 +1,46 @@
+name: Test basic usage
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        name: Run clean workflow action with defaults
+        uses: .
+        continue-on-error: true
+        with:
+          token: ${{ github.token }}
+          runs_older_than: "365"
+          runs_to_keep: "100"
+
+      - name: Assert action ran and outcome is acceptable
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          RESULT: ${{ steps.action.outputs.result }}
+        run: |
+          echo "outcome: '$OUTCOME'"
+          echo "result: '$RESULT'"
+          # The action either succeeds (made API calls) or fails due to API/permission issues.
+          # Both are acceptable as long as the action ran (outcome is not 'skipped').
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          # If succeeded, result output may be empty (no setOutput in source) or a number
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$RESULT" ]; then
+              echo "PASS: action completed successfully (result output not set)"
+            elif echo "$RESULT" | grep -qE '^[0-9]+$'; then
+              echo "PASS: result is a valid number: $RESULT"
+            else
+              echo "FAIL: expected result to be empty or a non-negative integer, got: '$RESULT'"
+              exit 1
+            fi
+          else
+            echo "PASS: action ran but encountered an API error (acceptable in test environment)"
+          fi

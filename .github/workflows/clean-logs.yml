@@ -1,0 +1,28 @@
+name: Clean Logs
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs_older_than:
+        description: "The amount of days old to delete"
+        default: "7"
+        required: false
+      runs_to_keep:
+        description: "The amount of latest workflows runs to keep"
+        default: "0"
+        required: false
+
+jobs:
+  clean-logs:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - uses: igorjs/gh-actions-clean-workflow@7d77b747b6e55fc693bc27d65fc9878b151e4155 # main
+        with:
+          runs_older_than: ${{ github.event.inputs.runs_older_than }}
+          runs_to_keep: ${{ github.event.inputs.runs_to_keep }}
