@@ -1,0 +1,46 @@
+{
+  "name": "@igorjs/gh-actions-clean-workflow",
+  "version": "8.0.0",
+  "description": "Github Action to delete old workflow runs",
+  "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916",
+  "engines": {
+    "node": ">=26.0.0",
+    "pnpm": ">=11.5.2"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "biome lint src",
+    "lint:fix": "biome lint --write src",
+    "format": "biome format src",
+    "format:fix": "biome format --write src",
+    "check": "biome check src",
+    "check:fix": "biome check --write src",
+    "typecheck": "tsc --noEmit",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --minify --platform=node --target=node24 --format=esm --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "all": "pnpm run check && pnpm run typecheck && pnpm run test && pnpm run build"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "JavaScript"
+  ],
+  "author": "Igor J. S. <oss@mail.igorjs.io> (https://igorjs.io/)",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@types/node": "^26.4.0",
+    "vitest": "^4.1.11",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

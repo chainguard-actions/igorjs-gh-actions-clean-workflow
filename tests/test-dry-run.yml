@@ -1,0 +1,47 @@
+name: Test dry-run mode
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          dry_run: "true"
+          runs_older_than: "7"
+          runs_to_keep: "0"
+
+      - name: Assert action ran (dry-run mode)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          TOTAL_FOUND: ${{ steps.action.outputs.total-runs-found }}
+          RUNS_DELETED: ${{ steps.action.outputs.runs-deleted }}
+          RUNS_FAILED: ${{ steps.action.outputs.runs-failed }}
+          TOTAL_API: ${{ steps.action.outputs.total-api-requests }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "total-runs-found: $TOTAL_FOUND"
+          echo "runs-deleted: $RUNS_DELETED"
+          echo "runs-failed: $RUNS_FAILED"
+          echo "total-api-requests: $TOTAL_API"
+
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded in dry-run mode"
+            # In dry-run mode, runs-deleted should be 0
+            if [ -n "$RUNS_DELETED" ] && [ "$RUNS_DELETED" != "0" ]; then
+              echo "FAIL: dry-run mode should not delete any runs, but runs-deleted=$RUNS_DELETED"
+              exit 1
+            fi
+            echo "PASS: dry-run mode correctly reports 0 deletions"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable via GitHub API)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

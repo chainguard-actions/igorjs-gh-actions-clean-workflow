@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+# Managed by github.com/igorjs-iac/repo-config
+#
+# Weekly scheduled cleanup of old workflow run history.
+# Deletes runs older than 7 days, keeping the 10 most recent per
+# workflow. SHA-pinned for supply-chain safety.
+
+name: clean-workflow
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"  # weekly Monday 04:00 UTC
+
+permissions: {}
+
+concurrency:
+  group: clean-workflow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+
+      - uses: igorjs/gh-actions-clean-workflow@5fa2e3a4fdd40e3e7098645a0b8df08624352e5e # v7
+        with:
+          runs_older_than: 7
+          runs_to_keep: 10

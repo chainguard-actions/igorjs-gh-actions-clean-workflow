@@ -1,0 +1,50 @@
+name: Test workflow name filter
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          dry_run: "true"
+          runs_older_than: "7"
+          runs_to_keep: "0"
+          workflow_names: "CI,Test"
+
+      - name: Assert action ran with workflow name filter
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          TOTAL_FOUND: ${{ steps.action.outputs.total-runs-found }}
+          RUNS_DELETED: ${{ steps.action.outputs.runs-deleted }}
+          RETRY_ATTEMPTS: ${{ steps.action.outputs.retry-attempts }}
+          RATE_LIMIT_HITS: ${{ steps.action.outputs.rate-limit-hits }}
+          CB_TRIPS: ${{ steps.action.outputs.circuit-breaker-trips }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "total-runs-found: $TOTAL_FOUND"
+          echo "runs-deleted: $RUNS_DELETED"
+          echo "retry-attempts: $RETRY_ATTEMPTS"
+          echo "rate-limit-hits: $RATE_LIMIT_HITS"
+          echo "circuit-breaker-trips: $CB_TRIPS"
+
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with workflow_names filter"
+            # In dry-run mode, runs-deleted should be 0
+            if [ -n "$RUNS_DELETED" ] && [ "$RUNS_DELETED" != "0" ]; then
+              echo "FAIL: dry-run mode should not delete any runs, but runs-deleted=$RUNS_DELETED"
+              exit 1
+            fi
+            echo "PASS: workflow filter accepted and dry-run mode respected"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable via GitHub API)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

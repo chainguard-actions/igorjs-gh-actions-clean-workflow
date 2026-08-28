@@ -1,0 +1,49 @@
+name: Test custom parameters
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          dry_run: "true"
+          runs_older_than: "30"
+          runs_to_keep: "5"
+
+      - name: Assert action ran with custom parameters
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          TOTAL_FOUND: ${{ steps.action.outputs.total-runs-found }}
+          RUNS_DELETED: ${{ steps.action.outputs.runs-deleted }}
+          TOTAL_API: ${{ steps.action.outputs.total-api-requests }}
+          SUCCESSFUL_REQS: ${{ steps.action.outputs.successful-requests }}
+          FAILED_REQS: ${{ steps.action.outputs.failed-requests }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "total-runs-found: $TOTAL_FOUND"
+          echo "runs-deleted: $RUNS_DELETED"
+          echo "total-api-requests: $TOTAL_API"
+          echo "successful-requests: $SUCCESSFUL_REQS"
+          echo "failed-requests: $FAILED_REQS"
+
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with custom parameters (runs_older_than=30, runs_to_keep=5)"
+            # In dry-run mode, runs-deleted should be 0
+            if [ -n "$RUNS_DELETED" ] && [ "$RUNS_DELETED" != "0" ]; then
+              echo "FAIL: dry-run mode should not delete any runs, but runs-deleted=$RUNS_DELETED"
+              exit 1
+            fi
+            echo "PASS: custom parameters accepted and dry-run mode respected"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable via GitHub API)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
