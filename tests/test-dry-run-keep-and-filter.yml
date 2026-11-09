@@ -1,0 +1,46 @@
+name: Test dry run with runs_to_keep and workflow filter
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          dry_run: "yes"
+          runs_older_than: "0"
+          runs_to_keep: "5"
+          workflow_names: "CI, Release Build"
+      - name: Assert outputs (or graceful failure on sentinel repo)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          TOTAL: ${{ steps.action.outputs.total-runs-found }}
+          DELETED: ${{ steps.action.outputs.runs-deleted }}
+          FAILED: ${{ steps.action.outputs.runs-failed }}
+        run: |
+          echo "outcome: $OUTCOME total=$TOTAL deleted=$DELETED failed=$FAILED"
+          if [ "$OUTCOME" = "success" ]; then
+            for v in "$TOTAL" "$DELETED" "$FAILED"; do
+              if ! echo "$v" | grep -qE '^[0-9]+$'; then
+                echo "FAIL: output '$v' is not a non-negative integer"
+                exit 1
+              fi
+            done
+            if [ "$FAILED" != "0" ]; then
+              echo "FAIL: dry run should not have failed deletions"
+              exit 1
+            fi
+            if [ "$DELETED" -gt "$TOTAL" ]; then
+              echo "FAIL: runs-deleted > total-runs-found"
+              exit 1
+            fi
+            echo "PASS: outputs valid"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

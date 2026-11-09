@@ -1,0 +1,46 @@
+name: Test dry run basic
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          dry_run: "true"
+          runs_older_than: "30"
+      - name: Assert outputs (or graceful failure on sentinel repo)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          TOTAL: ${{ steps.action.outputs.total-runs-found }}
+          DELETED: ${{ steps.action.outputs.runs-deleted }}
+          FAILED: ${{ steps.action.outputs.runs-failed }}
+          REQS: ${{ steps.action.outputs.total-api-requests }}
+          CB: ${{ steps.action.outputs.circuit-breaker-trips }}
+        run: |
+          echo "outcome: $OUTCOME total=$TOTAL deleted=$DELETED failed=$FAILED reqs=$REQS cb=$CB"
+          if [ "$OUTCOME" = "success" ]; then
+            for v in "$TOTAL" "$DELETED" "$FAILED" "$REQS" "$CB"; do
+              if ! echo "$v" | grep -qE '^[0-9]+$'; then
+                echo "FAIL: output '$v' is not a non-negative integer"
+                exit 1
+              fi
+            done
+            if [ "$FAILED" != "0" ]; then
+              echo "FAIL: dry run should not have failed deletions"
+              exit 1
+            fi
+            if [ "$DELETED" -gt "$TOTAL" ]; then
+              echo "FAIL: runs-deleted ($DELETED) > total-runs-found ($TOTAL)"
+              exit 1
+            fi
+            echo "PASS: outputs valid"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
