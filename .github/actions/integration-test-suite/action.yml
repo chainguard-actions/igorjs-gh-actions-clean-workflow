@@ -21,27 +21,17 @@ runs:
 
     - name: Display metrics (basic)
       shell: bash
-      env:
-        TOTAL_RUNS_FOUND: ${{ steps.basic.outputs['total-runs-found'] }}
-        RUNS_DELETED: ${{ steps.basic.outputs['runs-deleted'] }}
-        RUNS_FAILED: ${{ steps.basic.outputs['runs-failed'] }}
-        TOTAL_API_REQUESTS: ${{ steps.basic.outputs['total-api-requests'] }}
-        SUCCESSFUL_REQUESTS: ${{ steps.basic.outputs['successful-requests'] }}
-        FAILED_REQUESTS: ${{ steps.basic.outputs['failed-requests'] }}
-        RETRY_ATTEMPTS: ${{ steps.basic.outputs['retry-attempts'] }}
-        RATE_LIMIT_HITS: ${{ steps.basic.outputs['rate-limit-hits'] }}
-        CIRCUIT_BREAKER_TRIPS: ${{ steps.basic.outputs['circuit-breaker-trips'] }}
       run: |
         echo "=== Basic Dry Run Metrics ==="
-        echo "Total runs found: $TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $RUNS_DELETED"
-        echo "Runs failed: $RUNS_FAILED"
-        echo "API requests: $TOTAL_API_REQUESTS"
-        echo "Successful requests: $SUCCESSFUL_REQUESTS"
-        echo "Failed requests: $FAILED_REQUESTS"
-        echo "Retry attempts: $RETRY_ATTEMPTS"
-        echo "Rate limit hits: $RATE_LIMIT_HITS"
-        echo "Circuit breaker trips: $CIRCUIT_BREAKER_TRIPS"
+        echo "Total runs found: ${{ steps.basic.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.basic.outputs['runs-deleted'] }}"
+        echo "Runs failed: ${{ steps.basic.outputs['runs-failed'] }}"
+        echo "API requests: ${{ steps.basic.outputs['total-api-requests'] }}"
+        echo "Successful requests: ${{ steps.basic.outputs['successful-requests'] }}"
+        echo "Failed requests: ${{ steps.basic.outputs['failed-requests'] }}"
+        echo "Retry attempts: ${{ steps.basic.outputs['retry-attempts'] }}"
+        echo "Rate limit hits: ${{ steps.basic.outputs['rate-limit-hits'] }}"
+        echo "Circuit breaker trips: ${{ steps.basic.outputs['circuit-breaker-trips'] }}"
 
     - name: Verify metrics (basic)
       shell: bash
@@ -67,16 +57,12 @@ runs:
 
     - name: Display filtered metrics
       shell: bash
-      env:
-        TOTAL_RUNS_FOUND: ${{ steps.filter.outputs['total-runs-found'] }}
-        RUNS_DELETED: ${{ steps.filter.outputs['runs-deleted'] }}
-        TOTAL_API_REQUESTS: ${{ steps.filter.outputs['total-api-requests'] }}
       run: |
         echo "=== Workflow Filtering Metrics ==="
         echo "Filtered workflows: CI, Check Dist"
-        echo "Total runs found: $TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $RUNS_DELETED"
-        echo "API requests: $TOTAL_API_REQUESTS"
+        echo "Total runs found: ${{ steps.filter.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.filter.outputs['runs-deleted'] }}"
+        echo "API requests: ${{ steps.filter.outputs['total-api-requests'] }}"
 
     - name: Verify filtered metrics
       shell: bash
@@ -101,14 +87,11 @@ runs:
 
     - name: Display keep-many metrics
       shell: bash
-      env:
-        TOTAL_RUNS_FOUND: ${{ steps.keep-many.outputs['total-runs-found'] }}
-        RUNS_DELETED: ${{ steps.keep-many.outputs['runs-deleted'] }}
       run: |
         echo "=== Keep Many Runs Metrics ==="
         echo "Runs to keep: 100 per workflow"
-        echo "Total runs found: $TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $RUNS_DELETED"
+        echo "Total runs found: ${{ steps.keep-many.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.keep-many.outputs['runs-deleted'] }}"
 
     - name: Verify keep-many metrics
       shell: bash
@@ -133,14 +116,11 @@ runs:
 
     - name: Display delete-all metrics
       shell: bash
-      env:
-        TOTAL_RUNS_FOUND: ${{ steps.delete-all.outputs['total-runs-found'] }}
-        RUNS_DELETED: ${{ steps.delete-all.outputs['runs-deleted'] }}
       run: |
         echo "=== Delete All Old Runs Metrics ==="
         echo "Older than: 90 days"
-        echo "Total runs found: $TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $RUNS_DELETED"
+        echo "Total runs found: ${{ steps.delete-all.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.delete-all.outputs['runs-deleted'] }}"
 
     - name: Verify delete-all metrics
       shell: bash
@@ -168,14 +148,11 @@ runs:
 
     - name: Display short retention metrics
       shell: bash
-      env:
-        TOTAL_RUNS_FOUND: ${{ steps.short.outputs['total-runs-found'] }}
-        RUNS_DELETED: ${{ steps.short.outputs['runs-deleted'] }}
       run: |
         echo "=== Short Retention Metrics ==="
         echo "Retention: 1 day"
-        echo "Total runs found: $TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $RUNS_DELETED"
+        echo "Total runs found: ${{ steps.short.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.short.outputs['runs-deleted'] }}"
 
     - name: Verify short retention metrics
       shell: bash
@@ -201,18 +178,14 @@ runs:
 
     - name: Display combined metrics
       shell: bash
-      env:
-        TOTAL_RUNS_FOUND: ${{ steps.combined.outputs['total-runs-found'] }}
-        RUNS_DELETED: ${{ steps.combined.outputs['runs-deleted'] }}
-        CIRCUIT_BREAKER_TRIPS: ${{ steps.combined.outputs['circuit-breaker-trips'] }}
       run: |
         echo "=== Combined Features Metrics ==="
         echo "Workflows: Commit Lint, Coverage Badge"
         echo "Older than: 14 days"
         echo "Runs to keep: 3"
-        echo "Total runs found: $TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $RUNS_DELETED"
-        echo "Circuit breaker trips: $CIRCUIT_BREAKER_TRIPS"
+        echo "Total runs found: ${{ steps.combined.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.combined.outputs['runs-deleted'] }}"
+        echo "Circuit breaker trips: ${{ steps.combined.outputs['circuit-breaker-trips'] }}"
 
     - name: Verify combined metrics
       shell: bash

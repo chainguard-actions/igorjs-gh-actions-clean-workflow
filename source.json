@@ -4,8 +4,13 @@
   "version": "v8",
   "commit_sha": "b910eb365da5e592d865ddd8a72d01cbd720b3b1",
   "url": "https://github.com/igorjs/gh-actions-clean-workflow",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/igorjs/gh-actions-clean-workflow/v8/sha256-74922e3888afe068a0d67d1c637bd30e2c16eac043086427396c6deea3fffdff.tar.gz",
+    "sha256": "74922e3888afe068a0d67d1c637bd30e2c16eac043086427396c6deea3fffdff",
+    "size_bytes": 169923
+  }
 }
