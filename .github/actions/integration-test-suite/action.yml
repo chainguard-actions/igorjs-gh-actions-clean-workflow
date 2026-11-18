@@ -21,27 +21,17 @@ runs:
 
     - name: Display metrics (basic)
       shell: bash
-      env:
-        BASIC_TOTAL_RUNS_FOUND: ${{ steps.basic.outputs['total-runs-found'] }}
-        BASIC_RUNS_DELETED: ${{ steps.basic.outputs['runs-deleted'] }}
-        BASIC_RUNS_FAILED: ${{ steps.basic.outputs['runs-failed'] }}
-        BASIC_TOTAL_API_REQUESTS: ${{ steps.basic.outputs['total-api-requests'] }}
-        BASIC_SUCCESSFUL_REQUESTS: ${{ steps.basic.outputs['successful-requests'] }}
-        BASIC_FAILED_REQUESTS: ${{ steps.basic.outputs['failed-requests'] }}
-        BASIC_RETRY_ATTEMPTS: ${{ steps.basic.outputs['retry-attempts'] }}
-        BASIC_RATE_LIMIT_HITS: ${{ steps.basic.outputs['rate-limit-hits'] }}
-        BASIC_CIRCUIT_BREAKER_TRIPS: ${{ steps.basic.outputs['circuit-breaker-trips'] }}
       run: |
         echo "=== Basic Dry Run Metrics ==="
-        echo "Total runs found: $BASIC_TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $BASIC_RUNS_DELETED"
-        echo "Runs failed: $BASIC_RUNS_FAILED"
-        echo "API requests: $BASIC_TOTAL_API_REQUESTS"
-        echo "Successful requests: $BASIC_SUCCESSFUL_REQUESTS"
-        echo "Failed requests: $BASIC_FAILED_REQUESTS"
-        echo "Retry attempts: $BASIC_RETRY_ATTEMPTS"
-        echo "Rate limit hits: $BASIC_RATE_LIMIT_HITS"
-        echo "Circuit breaker trips: $BASIC_CIRCUIT_BREAKER_TRIPS"
+        echo "Total runs found: ${{ steps.basic.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.basic.outputs['runs-deleted'] }}"
+        echo "Runs failed: ${{ steps.basic.outputs['runs-failed'] }}"
+        echo "API requests: ${{ steps.basic.outputs['total-api-requests'] }}"
+        echo "Successful requests: ${{ steps.basic.outputs['successful-requests'] }}"
+        echo "Failed requests: ${{ steps.basic.outputs['failed-requests'] }}"
+        echo "Retry attempts: ${{ steps.basic.outputs['retry-attempts'] }}"
+        echo "Rate limit hits: ${{ steps.basic.outputs['rate-limit-hits'] }}"
+        echo "Circuit breaker trips: ${{ steps.basic.outputs['circuit-breaker-trips'] }}"
 
     # Test 2: Workflow filtering
     - name: Test workflow name filtering
@@ -55,16 +45,12 @@ runs:
 
     - name: Display filtered metrics
       shell: bash
-      env:
-        FILTER_TOTAL_RUNS_FOUND: ${{ steps.filter.outputs['total-runs-found'] }}
-        FILTER_RUNS_DELETED: ${{ steps.filter.outputs['runs-deleted'] }}
-        FILTER_TOTAL_API_REQUESTS: ${{ steps.filter.outputs['total-api-requests'] }}
       run: |
         echo "=== Workflow Filtering Metrics ==="
         echo "Filtered workflows: Test and Lint, Check Dist"
-        echo "Total runs found: $FILTER_TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $FILTER_RUNS_DELETED"
-        echo "API requests: $FILTER_TOTAL_API_REQUESTS"
+        echo "Total runs found: ${{ steps.filter.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.filter.outputs['runs-deleted'] }}"
+        echo "API requests: ${{ steps.filter.outputs['total-api-requests'] }}"
 
     # Test 3: Keep all recent runs (runs_to_keep = 100)
     - name: Test keeping many runs
@@ -77,14 +63,11 @@ runs:
 
     - name: Display keep-many metrics
       shell: bash
-      env:
-        KEEP_MANY_TOTAL_RUNS_FOUND: ${{ steps.keep-many.outputs['total-runs-found'] }}
-        KEEP_MANY_RUNS_DELETED: ${{ steps.keep-many.outputs['runs-deleted'] }}
       run: |
         echo "=== Keep Many Runs Metrics ==="
         echo "Runs to keep: 100 per workflow"
-        echo "Total runs found: $KEEP_MANY_TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $KEEP_MANY_RUNS_DELETED"
+        echo "Total runs found: ${{ steps.keep-many.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.keep-many.outputs['runs-deleted'] }}"
 
     # Test 4: Delete all old runs (runs_to_keep = 0)
     - name: Test deleting all old runs
@@ -97,14 +80,11 @@ runs:
 
     - name: Display delete-all metrics
       shell: bash
-      env:
-        DELETE_ALL_TOTAL_RUNS_FOUND: ${{ steps.delete-all.outputs['total-runs-found'] }}
-        DELETE_ALL_RUNS_DELETED: ${{ steps.delete-all.outputs['runs-deleted'] }}
       run: |
         echo "=== Delete All Old Runs Metrics ==="
         echo "Older than: 90 days"
-        echo "Total runs found: $DELETE_ALL_TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $DELETE_ALL_RUNS_DELETED"
+        echo "Total runs found: ${{ steps.delete-all.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.delete-all.outputs['runs-deleted'] }}"
 
     # Test 5: Short retention period
     - name: Test short retention
@@ -117,14 +97,11 @@ runs:
 
     - name: Display short retention metrics
       shell: bash
-      env:
-        SHORT_TOTAL_RUNS_FOUND: ${{ steps.short.outputs['total-runs-found'] }}
-        SHORT_RUNS_DELETED: ${{ steps.short.outputs['runs-deleted'] }}
       run: |
         echo "=== Short Retention Metrics ==="
         echo "Retention: 1 day"
-        echo "Total runs found: $SHORT_TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $SHORT_RUNS_DELETED"
+        echo "Total runs found: ${{ steps.short.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.short.outputs['runs-deleted'] }}"
 
     # Test 6: Combined filtering and retention
     - name: Test combined features
@@ -138,15 +115,11 @@ runs:
 
     - name: Display combined metrics
       shell: bash
-      env:
-        COMBINED_TOTAL_RUNS_FOUND: ${{ steps.combined.outputs['total-runs-found'] }}
-        COMBINED_RUNS_DELETED: ${{ steps.combined.outputs['runs-deleted'] }}
-        COMBINED_CIRCUIT_BREAKER_TRIPS: ${{ steps.combined.outputs['circuit-breaker-trips'] }}
       run: |
         echo "=== Combined Features Metrics ==="
         echo "Workflows: Clean Logs, Dependabot"
         echo "Older than: 14 days"
         echo "Runs to keep: 3"
-        echo "Total runs found: $COMBINED_TOTAL_RUNS_FOUND"
-        echo "Runs to delete: $COMBINED_RUNS_DELETED"
-        echo "Circuit breaker trips: $COMBINED_CIRCUIT_BREAKER_TRIPS"
+        echo "Total runs found: ${{ steps.combined.outputs['total-runs-found'] }}"
+        echo "Runs to delete: ${{ steps.combined.outputs['runs-deleted'] }}"
+        echo "Circuit breaker trips: ${{ steps.combined.outputs['circuit-breaker-trips'] }}"
